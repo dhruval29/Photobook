@@ -165,6 +165,7 @@ async function initializeFlipbook() {
         const config = {
             width: dimensions.width,
             height: dimensions.height,
+            devicePixelRatio: isMobile ? (window.devicePixelRatio || 1) : Math.max(window.devicePixelRatio || 1, 1.25), // Retina-aware; 1.25x supersampling on 1x desktop only
             size: 'stretch', // Makes the book responsive
             minWidth: 200,
             maxWidth: 4000, // Allow much larger sizes for high quality
