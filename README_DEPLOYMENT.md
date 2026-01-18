@@ -87,11 +87,29 @@ You can add a custom domain:
 3. Add your custom domain
 4. Follow DNS configuration instructions
 
+### Where to Store Images for Faster Loading
+
+**Current (recommended for ~50 images):** Keep images in the `images/` folder in the repo. Vercel serves them from the **Edge Network (CDN)** with your 1-year cache headers—already fast.
+
+**If you need to move off the repo** (deployment size limits, many more images, or no-redeploy updates):
+
+| Option | Best for | Notes |
+|--------|----------|-------|
+| **Vercel Blob** | Staying on Vercel, simplest | Upload via dashboard or `@vercel/blob`. Set `IMAGE_BASE_URL` in `flipbook.js` to the Blob origin (e.g. `https://xxx.public.blob.vercel-storage.com`). |
+| **Cloudflare R2 + CDN** | Large libraries, no egress cost | S3-compatible; put a Cloudflare (or custom) domain in front. Set `IMAGE_BASE_URL` to the CDN URL. |
+| **Image CDN (Cloudinary, imgix)** | On-the-fly resizing, AVIF | Use if you need multiple sizes or formats. Set `IMAGE_BASE_URL` to the CDN base. |
+
+To use an external CDN: in `assets/js/flipbook.js`, set  
+`IMAGE_BASE_URL = 'https://your-cdn-origin.com'` (no trailing slash).  
+Keep the same path structure in the CDN (e.g. `images/Cover.webp`, `images/image_1.webp`).  
+If you use a CDN, remove or update the `<link rel="preload" as="image" href="images/Cover.webp">` in `index.html`.
+
 ### Performance Tips
 
 Your deployment is already optimized with:
 - ✅ WebP images (small file size, high quality)
 - ✅ Long cache headers for images
+- ✅ Preload of cover image for faster LCP
 - ✅ Efficient loading with StPageFlip
 - ✅ Responsive design
 - ✅ High-quality image rendering

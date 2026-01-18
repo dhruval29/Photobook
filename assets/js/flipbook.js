@@ -26,6 +26,13 @@ const IMAGE_PREFIX = 'image_'; // Content: image_1, image_2, ... image_49
 const IMAGE_EXTENSION = '.webp';
 const COVER_FILENAME = 'Cover'; // images/Cover.webp — the book cover (page 1)
 
+// Blob/CDN base URL: paste your Vercel Blob store URL here (no trailing slash).
+// Find it: Vercel dashboard → Storage → your store → open any image → copy the domain part, e.g.:
+//   https://abc123xyz.public.blob.vercel-storage.com
+// Your Blob paths must be: images/Cover.webp, images/image_1.webp, ... images/image_49.webp
+// Leave '' to use the /images/ folder in the repo instead.
+const IMAGE_BASE_URL = 'https://fmkkb36uawihxita.public.blob.vercel-storage.com';
+
 /* ============================================
    GLOBAL VARIABLES
    ============================================ */
@@ -58,7 +65,14 @@ const elements = {
  */
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Initializing Photo Book Flipbook...');
-    
+
+    // Preload cover (works for same-origin or IMAGE_BASE_URL / Blob)
+    const preload = document.createElement('link');
+    preload.rel = 'preload';
+    preload.as = 'image';
+    preload.href = getPageImagePath(1);
+    document.head.appendChild(preload);
+
     // Cache DOM elements
     cacheElements();
     
@@ -373,10 +387,11 @@ function loadPageImage(pageNumber) {
  * Page 1 = cover (Cover.webp). Pages 2–50 = image_1.webp … image_49.webp
  */
 function getPageImagePath(pageNumber) {
-    if (pageNumber === 1) {
-        return `${IMAGE_FOLDER}/${COVER_FILENAME}${IMAGE_EXTENSION}`;
-    }
-    return `${IMAGE_FOLDER}/${IMAGE_PREFIX}${pageNumber - 1}${IMAGE_EXTENSION}`;
+    const rel = pageNumber === 1
+        ? `${IMAGE_FOLDER}/${COVER_FILENAME}${IMAGE_EXTENSION}`
+        : `${IMAGE_FOLDER}/${IMAGE_PREFIX}${pageNumber - 1}${IMAGE_EXTENSION}`;
+    const base = (IMAGE_BASE_URL || '').replace(/\/$/, '');
+    return base ? `${base}/${rel}` : rel;
 }
 
 /**
