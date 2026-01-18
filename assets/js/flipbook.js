@@ -175,7 +175,7 @@ async function initializeFlipbook() {
         const config = {
             width: dimensions.width,
             height: dimensions.height,
-            devicePixelRatio: isMobile ? (window.devicePixelRatio || 1) : Math.max(window.devicePixelRatio || 1, 1.25), // Retina-aware; 1.25x supersampling on 1x desktop only
+            devicePixelRatio: Math.min(Math.max(window.devicePixelRatio || 1, 2), 3), // At least 2x for sharp rendering (supersampling on 1x), cap 3 for memory
             canvasBackground: '#1e1e1e', // Background of .stf__wrapper / canvas; matches main background
             size: 'stretch', // Makes the book responsive
             minWidth: 200,

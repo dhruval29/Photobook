@@ -120,7 +120,6 @@ html, body {
     height: 100% !important;
     display: block;
     margin: 0 auto;
-    /* Smooth scaling for photos */
     image-rendering: auto;
     -ms-interpolation-mode: bicubic;
 }
