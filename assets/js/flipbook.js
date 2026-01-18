@@ -3,30 +3,28 @@
  * 
  * A high-quality, responsive flipbook implementation using StPageFlip
  * 
- * HOW TO ADD/REMOVE PAGES:
- * 1. Add your image files to the /pages/ folder (or /images/ folder)
- * 2. Update the PAGE_COUNT constant below to match the number of images
- * 3. Ensure images are named sequentially (e.g., page-01.jpg, page-02.jpg, etc.)
- *    OR update the getPageImage() function to match your naming convention
+ * STRUCTURE:
+ * - Page 1: cover (images/Cover.webp)
+ * - Pages 2–N: images/image_1.webp, image_2.webp, … image_(N-1).webp
  * 
- * CONFIGURATION:
- * - PAGE_COUNT: Total number of pages in your flipbook
- * - IMAGE_FOLDER: Path to your images folder
- * - IMAGE_PREFIX: Prefix for image filenames
- * - IMAGE_EXTENSION: File extension (.jpg, .png, .webp, etc.)
+ * HOW TO ADD/REMOVE PAGES:
+ * 1. Cover: ensure images/Cover.webp exists (or set COVER_FILENAME)
+ * 2. Content: add image_1.webp, image_2.webp, … and set PAGE_COUNT = 1 + content count
+ * 3. getPageImagePath() maps page 1 → cover, page n → image_(n-1)
  */
 
 /* ============================================
    CONFIGURATION
    ============================================ */
 
-// Total number of pages (UPDATE THIS when adding/removing pages)
-const PAGE_COUNT = 48;
+// Total number of pages: 1 cover + content (UPDATE when adding/removing)
+const PAGE_COUNT = 50; // cover + image_1 through image_49
 
 // Image configuration
-const IMAGE_FOLDER = 'images'; // Change to 'pages' if using a pages folder
-const IMAGE_PREFIX = 'image_'; // Change to match your naming (e.g., 'page-' for page-01.jpg)
-const IMAGE_EXTENSION = '.webp'; // Change to .jpg, .png, etc. as needed
+const IMAGE_FOLDER = 'images';
+const IMAGE_PREFIX = 'image_'; // Content: image_1, image_2, ... image_49
+const IMAGE_EXTENSION = '.webp';
+const COVER_FILENAME = 'Cover'; // images/Cover.webp — the book cover (page 1)
 
 /* ============================================
    GLOBAL VARIABLES
@@ -34,7 +32,6 @@ const IMAGE_EXTENSION = '.webp'; // Change to .jpg, .png, etc. as needed
 
 let pageFlip = null;
 let currentPageNumber = 0;
-let isFullscreen = false;
 let isMobile = false;
 let controlsTimeout = null;
 
@@ -43,11 +40,11 @@ const elements = {
     loading: null,
     container: null,
     controls: null,
+    pageSlider: null,
     prevBtn: null,
     nextBtn: null,
     currentPageSpan: null,
     totalPagesSpan: null,
-    fullscreenBtn: null,
     instructions: null,
     closeInstructions: null
 };
@@ -85,11 +82,11 @@ function cacheElements() {
     elements.loading = document.getElementById('loading');
     elements.container = document.getElementById('flipbook-container');
     elements.controls = document.getElementById('controls');
+    elements.pageSlider = document.getElementById('page-slider');
     elements.prevBtn = document.getElementById('prev-btn');
     elements.nextBtn = document.getElementById('next-btn');
     elements.currentPageSpan = document.getElementById('current-page');
     elements.totalPagesSpan = document.getElementById('total-pages');
-    elements.fullscreenBtn = document.getElementById('fullscreen-btn');
     elements.instructions = document.getElementById('instructions');
     elements.closeInstructions = document.getElementById('close-instructions');
 }
@@ -111,9 +108,16 @@ function setupEventListeners() {
     // Navigation buttons
     elements.prevBtn.addEventListener('click', () => previousPage());
     elements.nextBtn.addEventListener('click', () => nextPage());
-    
-    // Fullscreen button
-    elements.fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+    // Page slider
+    if (elements.pageSlider) {
+        elements.pageSlider.addEventListener('input', (e) => {
+            const pageIndex = parseInt(e.target.value, 10);
+            if (pageFlip && pageIndex >= 0 && pageIndex < PAGE_COUNT && pageIndex !== currentPageNumber) {
+                pageFlip.turnToPage(pageIndex);
+            }
+        });
+    }
     
     // Instructions
     elements.closeInstructions.addEventListener('click', closeInstructions);
@@ -129,12 +133,6 @@ function setupEventListeners() {
             handleResize();
         }, 250);
     });
-    
-    // Fullscreen change detection
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     
     // Mouse movement for auto-hiding controls (desktop only)
     if (!isMobile) {
@@ -166,12 +164,13 @@ async function initializeFlipbook() {
             width: dimensions.width,
             height: dimensions.height,
             devicePixelRatio: isMobile ? (window.devicePixelRatio || 1) : Math.max(window.devicePixelRatio || 1, 1.25), // Retina-aware; 1.25x supersampling on 1x desktop only
+            canvasBackground: '#1e1e1e', // Background of .stf__wrapper / canvas; matches main background
             size: 'stretch', // Makes the book responsive
             minWidth: 200,
             maxWidth: 4000, // Allow much larger sizes for high quality
             minHeight: 300,
             maxHeight: 3000, // Allow much larger sizes for high quality
-            maxShadowOpacity: 0.5,
+            maxShadowOpacity: 0.25, /* was 0.5; reduced 50% for lighter flip shadow */
             showCover: true,
             mobileScrollSupport: false, // Disable vertical scroll in flipbook
             swipeDistance: 30,
@@ -314,6 +313,13 @@ async function loadPages() {
     
     // Update total pages display
     elements.totalPagesSpan.textContent = PAGE_COUNT;
+
+    // Page slider range
+    if (elements.pageSlider) {
+        elements.pageSlider.min = 0;
+        elements.pageSlider.max = Math.max(0, PAGE_COUNT - 1);
+        elements.pageSlider.value = 0;
+    }
     
     // Setup page flip event listeners
     pageFlip.on('flip', (e) => {
@@ -364,21 +370,13 @@ function loadPageImage(pageNumber) {
 
 /**
  * Get the path for a page image
- * Customize this function to match your naming convention
+ * Page 1 = cover (Cover.webp). Pages 2–50 = image_1.webp … image_49.webp
  */
 function getPageImagePath(pageNumber) {
-    // Format: images/pho_1.webp, images/pho_2.webp, etc.
-    return `${IMAGE_FOLDER}/${IMAGE_PREFIX}${pageNumber}${IMAGE_EXTENSION}`;
-    
-    // Alternative formats (uncomment and modify as needed):
-    
-    // Zero-padded format: pages/page-01.jpg, pages/page-02.jpg, etc.
-    // const paddedNumber = pageNumber.toString().padStart(2, '0');
-    // return `${IMAGE_FOLDER}/${IMAGE_PREFIX}${paddedNumber}${IMAGE_EXTENSION}`;
-    
-    // Three-digit format: pages/page-001.jpg
-    // const paddedNumber = pageNumber.toString().padStart(3, '0');
-    // return `${IMAGE_FOLDER}/${IMAGE_PREFIX}${paddedNumber}${IMAGE_EXTENSION}`;
+    if (pageNumber === 1) {
+        return `${IMAGE_FOLDER}/${COVER_FILENAME}${IMAGE_EXTENSION}`;
+    }
+    return `${IMAGE_FOLDER}/${IMAGE_PREFIX}${pageNumber - 1}${IMAGE_EXTENSION}`;
 }
 
 /**
@@ -439,6 +437,9 @@ function previousPage() {
 function updatePageIndicator() {
     const displayPage = currentPageNumber + 1;
     elements.currentPageSpan.textContent = displayPage;
+    if (elements.pageSlider) {
+        elements.pageSlider.value = currentPageNumber;
+    }
 }
 
 /**
@@ -477,99 +478,6 @@ function handleKeyPress(event) {
                 pageFlip.flip(PAGE_COUNT - 1);
             }
             break;
-        case 'f':
-        case 'F':
-            toggleFullscreen();
-            break;
-        case 'Escape':
-            if (isFullscreen) {
-                exitFullscreen();
-            }
-            break;
-    }
-}
-
-/* ============================================
-   FULLSCREEN FUNCTIONALITY
-   ============================================ */
-
-/**
- * Toggle fullscreen mode
- */
-function toggleFullscreen() {
-    if (!isFullscreen) {
-        enterFullscreen();
-    } else {
-        exitFullscreen();
-    }
-}
-
-/**
- * Enter fullscreen mode
- */
-function enterFullscreen() {
-    const wrapper = document.querySelector('.flipbook-wrapper');
-    
-    if (wrapper.requestFullscreen) {
-        wrapper.requestFullscreen();
-    } else if (wrapper.webkitRequestFullscreen) {
-        wrapper.webkitRequestFullscreen();
-    } else if (wrapper.mozRequestFullScreen) {
-        wrapper.mozRequestFullScreen();
-    } else if (wrapper.msRequestFullscreen) {
-        wrapper.msRequestFullscreen();
-    }
-}
-
-/**
- * Exit fullscreen mode
- */
-function exitFullscreen() {
-    if (document.exitFullscreen) {
-        document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-    } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-    }
-}
-
-/**
- * Handle fullscreen change events
- */
-function handleFullscreenChange() {
-    isFullscreen = !!(document.fullscreenElement || 
-                      document.webkitFullscreenElement || 
-                      document.mozFullScreenElement || 
-                      document.msFullscreenElement);
-    
-    console.log(`🖥 Fullscreen: ${isFullscreen ? 'ON' : 'OFF'}`);
-    
-    // Update fullscreen icon
-    updateFullscreenIcon();
-    
-    // Resize flipbook if needed
-    if (pageFlip) {
-        setTimeout(() => {
-            pageFlip.updateFromHtml();
-        }, 300);
-    }
-}
-
-/**
- * Update fullscreen button icon
- */
-function updateFullscreenIcon() {
-    const icon = document.getElementById('fullscreen-icon');
-    
-    if (isFullscreen) {
-        // Exit fullscreen icon
-        icon.innerHTML = '<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>';
-    } else {
-        // Enter fullscreen icon
-        icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
     }
 }
 
@@ -688,7 +596,6 @@ function logStatistics() {
         totalPages: PAGE_COUNT,
         currentPage: currentPageNumber + 1,
         isMobile: isMobile,
-        isFullscreen: isFullscreen,
         orientation: pageFlip.getOrientation(),
         pageCount: pageFlip.getPageCount(),
         bounds: pageFlip.getBoundsRect()

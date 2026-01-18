@@ -29,7 +29,9 @@
 
         <!-- Controls Overlay -->
         <div id="controls" class="controls hidden">
-            
+            <!-- Page Slider -->
+            <input type="range" id="page-slider" class="page-slider" min="0" max="1" value="0" aria-label="Go to page">
+
             <!-- Navigation Buttons -->
             <div class="nav-controls">
                 <button id="prev-btn" class="nav-btn" aria-label="Previous page">
@@ -47,16 +49,6 @@
                 <button id="next-btn" class="nav-btn" aria-label="Next page">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Additional Controls -->
-            <div class="extra-controls">
-                <!-- Fullscreen Toggle -->
-                <button id="fullscreen-btn" class="control-btn" aria-label="Toggle fullscreen">
-                    <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
                     </svg>
                 </button>
             </div>
