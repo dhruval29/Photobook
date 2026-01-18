@@ -3,13 +3,6 @@
   "buildCommand": "npm install",
   "installCommand": "npm install",
   "framework": null,
-  "outputDirectory": ".",
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "headers": [
     {
       "source": "/images/(.*)",
