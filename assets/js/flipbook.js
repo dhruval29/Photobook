@@ -21,16 +21,14 @@
 const PAGE_COUNT = 50; // cover + image_1 through image_49
 
 // Image configuration
-const IMAGE_FOLDER = 'images';
 const IMAGE_PREFIX = 'image_'; // Content: image_1, image_2, ... image_49
 const IMAGE_EXTENSION = '.webp';
-const COVER_FILENAME = 'Cover'; // images/Cover.webp — the book cover (page 1)
+const COVER_FILENAME = 'Cover'; // Cover.webp — the book cover (page 1)
 
-// Blob/CDN base URL: paste your Vercel Blob store URL here (no trailing slash).
-// Find it: Vercel dashboard → Storage → your store → open any image → copy the domain part, e.g.:
-//   https://abc123xyz.public.blob.vercel-storage.com
-// Your Blob paths must be: images/Cover.webp, images/image_1.webp, ... images/image_49.webp
-// Leave '' to use the /images/ folder in the repo instead.
+// Folder in paths: 'images' for images/Cover.webp; '' if Blob files are at root (Cover.webp, image_1.webp)
+const IMAGE_FOLDER = '';
+
+// Blob/CDN base URL (no trailing slash). Leave '' to use /images/ from the repo.
 const IMAGE_BASE_URL = 'https://fmkkb36uawihxita.public.blob.vercel-storage.com';
 
 /* ============================================
@@ -387,9 +385,8 @@ function loadPageImage(pageNumber) {
  * Page 1 = cover (Cover.webp). Pages 2–50 = image_1.webp … image_49.webp
  */
 function getPageImagePath(pageNumber) {
-    const rel = pageNumber === 1
-        ? `${IMAGE_FOLDER}/${COVER_FILENAME}${IMAGE_EXTENSION}`
-        : `${IMAGE_FOLDER}/${IMAGE_PREFIX}${pageNumber - 1}${IMAGE_EXTENSION}`;
+    const name = pageNumber === 1 ? `${COVER_FILENAME}${IMAGE_EXTENSION}` : `${IMAGE_PREFIX}${pageNumber - 1}${IMAGE_EXTENSION}`;
+    const rel = IMAGE_FOLDER ? `${IMAGE_FOLDER}/${name}` : name;
     const base = (IMAGE_BASE_URL || '').replace(/\/$/, '');
     return base ? `${base}/${rel}` : rel;
 }
