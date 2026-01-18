@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive Photo Book Flipbook">
+    <title>Photo Book Flipbook</title>
+    
+    <!-- StPageFlip Library - Browser Version -->
+    <link rel="stylesheet" href="node_modules/page-flip/dist/css/stPageFlip.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="flipbook-wrapper">
+        
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading Photo Book...</p>
+        </div>
+
+        <!-- Flipbook Container -->
+        <div id="flipbook-container" class="flipbook-container">
+            <!-- Pages will be dynamically inserted here -->
+        </div>
+
+        <!-- Controls Overlay -->
+        <div id="controls" class="controls hidden">
+            
+            <!-- Navigation Buttons -->
+            <div class="nav-controls">
+                <button id="prev-btn" class="nav-btn" aria-label="Previous page">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                
+                <div class="page-info">
+                    <span id="current-page">1</span>
+                    <span class="separator">/</span>
+                    <span id="total-pages">0</span>
+                </div>
+                
+                <button id="next-btn" class="nav-btn" aria-label="Next page">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Additional Controls -->
+            <div class="extra-controls">
+                <!-- Fullscreen Toggle -->
+                <button id="fullscreen-btn" class="control-btn" aria-label="Toggle fullscreen">
+                    <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Notice (Hidden by default, appears on first load) -->
+    <div id="instructions" class="instructions">
+        <div class="instructions-content">
+            <h3>How to Navigate</h3>
+            <ul>
+                <li><strong>Desktop:</strong> Click and drag pages, or use arrow buttons</li>
+                <li><strong>Mobile:</strong> Swipe left/right to turn pages</li>
+                <li><strong>Keyboard:</strong> Use arrow keys ← →</li>
+            </ul>
+            <button id="close-instructions" class="close-btn">Got it!</button>
+        </div>
+    </div>
+
+    <!-- StPageFlip Library Script -->
+    <script src="node_modules/page-flip/dist/js/page-flip.browser.js"></script>
+    
+    <!-- Custom Flipbook Script -->
+    <script src="js/flipbook.js"></script>
+</body>
+</html>
