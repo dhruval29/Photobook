@@ -149,12 +149,15 @@ html, body {
     align-items: center;
     justify-content: center;
     padding: 20px 40px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     background: transparent;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
-    z-index: 100;
+    z-index: 500;
     gap: 14px;
+    /* Improve touch response and avoid 300ms delay on mobile */
+    touch-action: manipulation;
 }
 
 .controls:not(.hidden) {
@@ -185,6 +188,7 @@ html, body {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
     outline: none;
+    touch-action: manipulation;
 }
 
 .page-slider::-webkit-slider-thumb {
@@ -249,6 +253,7 @@ html, body {
     color: #fff;
     transition: all 0.2s ease;
     backdrop-filter: blur(10px);
+    touch-action: manipulation;
 }
 
 .nav-btn:hover:not(:disabled) {
@@ -461,6 +466,37 @@ html, body {
         font-size: 13px;
         padding: 6px 12px;
         min-width: 60px;
+    }
+}
+
+/* Phone in landscape: short viewport can cause flipbook to overlap controls.
+   Ensure controls stay on top, have room, and remain tappable. */
+@media (orientation: landscape) and (max-height: 500px) {
+    .flipbook-container {
+        height: 55vh;
+    }
+
+    .controls {
+        padding: 10px 20px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        pointer-events: auto !important;
+        opacity: 1 !important;
+        /* Keep controls clearly above flipbook canvas */
+        z-index: 500;
+    }
+
+    /* Larger tap targets in landscape (at least 44px for accessibility) */
+    .nav-btn {
+        min-width: 44px;
+        min-height: 44px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .page-slider::-webkit-slider-thumb,
+    .page-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
     }
 }
 
