@@ -39,6 +39,8 @@ let pageFlip = null;
 let currentPageNumber = 0;
 let isMobile = false;
 let controlsTimeout = null;
+/** When we handled touchend, skip the next click to avoid double action on touch devices. */
+let lastTouchHandledAt = 0;
 
 // DOM Elements
 const elements = {
@@ -117,9 +119,29 @@ function detectDevice() {
  * Setup all event listeners
  */
 function setupEventListeners() {
-    // Navigation buttons
-    elements.prevBtn.addEventListener('click', () => previousPage());
-    elements.nextBtn.addEventListener('click', () => nextPage());
+    // Navigation buttons: click for mouse/keyboard; touchend for iOS (click often doesn't fire in landscape).
+    elements.prevBtn.addEventListener('click', () => {
+        if (Date.now() - lastTouchHandledAt < 400) return;
+        previousPage();
+    });
+    elements.nextBtn.addEventListener('click', () => {
+        if (Date.now() - lastTouchHandledAt < 400) return;
+        nextPage();
+    });
+    elements.prevBtn.addEventListener('touchend', (e) => {
+        if (!elements.prevBtn.contains(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        lastTouchHandledAt = Date.now();
+        previousPage();
+    }, { passive: false });
+    elements.nextBtn.addEventListener('touchend', (e) => {
+        if (!elements.nextBtn.contains(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        lastTouchHandledAt = Date.now();
+        nextPage();
+    }, { passive: false });
 
     // Page slider (input = while dragging; change = on release, helps on iOS)
     if (elements.pageSlider) {
@@ -134,7 +156,17 @@ function setupEventListeners() {
     }
     
     // Instructions
-    elements.closeInstructions.addEventListener('click', closeInstructions);
+    elements.closeInstructions.addEventListener('click', () => {
+        if (Date.now() - lastTouchHandledAt < 400) return;
+        closeInstructions();
+    });
+    elements.closeInstructions.addEventListener('touchend', (e) => {
+        if (!elements.closeInstructions.contains(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        lastTouchHandledAt = Date.now();
+        closeInstructions();
+    }, { passive: false });
     
     // Keyboard navigation
     document.addEventListener('keydown', handleKeyPress);

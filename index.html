@@ -29,32 +29,32 @@
         <div id="flipbook-container" class="flipbook-container">
             <!-- Pages will be dynamically inserted here -->
         </div>
+    </div>
 
-        <!-- Controls Overlay -->
-        <div id="controls" class="controls hidden">
-            <!-- Page Slider -->
-            <input type="range" id="page-slider" class="page-slider" min="0" max="1" value="0" aria-label="Go to page">
+    <!-- Controls: outside flipbook-wrapper so they are never covered by canvas on iOS landscape -->
+    <div id="controls" class="controls hidden">
+        <!-- Page Slider -->
+        <input type="range" id="page-slider" class="page-slider" min="0" max="1" value="0" aria-label="Go to page">
 
-            <!-- Navigation Buttons -->
-            <div class="nav-controls">
-                <button id="prev-btn" class="nav-btn" aria-label="Previous page">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                </button>
-                
-                <div class="page-info">
-                    <span id="current-page">1</span>
-                    <span class="separator">/</span>
-                    <span id="total-pages">0</span>
-                </div>
-                
-                <button id="next-btn" class="nav-btn" aria-label="Next page">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
+        <!-- Navigation Buttons -->
+        <div class="nav-controls">
+            <button id="prev-btn" class="nav-btn" aria-label="Previous page">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            
+            <div class="page-info">
+                <span id="current-page">1</span>
+                <span class="separator">/</span>
+                <span id="total-pages">0</span>
             </div>
+            
+            <button id="next-btn" class="nav-btn" aria-label="Next page">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
         </div>
     </div>
 

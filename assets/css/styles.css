@@ -168,8 +168,8 @@ html, body {
     display: none;
 }
 
-/* Auto-hide controls on inactivity (except on mobile) */
-.flipbook-wrapper:hover .controls:not(.hidden),
+/* Auto-hide controls on inactivity (except on mobile). Controls are sibling of flipbook-wrapper. */
+.flipbook-wrapper:hover ~ .controls:not(.hidden),
 .controls.active {
     opacity: 1;
 }
@@ -272,6 +272,8 @@ html, body {
 .nav-btn svg {
     width: 18px;
     height: 18px;
+    /* Let the button receive the touch, not the SVG (helps on iOS) */
+    pointer-events: none;
 }
 
 /* Page Info Display */
@@ -481,6 +483,7 @@ html, body {
 
     .flipbook-container {
         height: 50vh;
+        z-index: 1;
     }
 
     .controls {
@@ -494,9 +497,16 @@ html, body {
         z-index: 999;
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
+        /* Take full control of touches: no browser scroll/zoom on this strip */
+        touch-action: none;
+        -webkit-touch-callout: none;
         /* Prevent accidental text selection on long-press */
         -webkit-user-select: none;
         user-select: none;
+    }
+
+    .page-slider {
+        touch-action: none;
     }
 
     /* Larger tap targets in landscape (at least 44px for accessibility) */
