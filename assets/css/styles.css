@@ -469,19 +469,34 @@ html, body {
 }
 
 /* Phone in landscape: short viewport can cause flipbook to overlap controls.
-   Ensure controls stay on top, have room, and remain tappable. */
+   Ensure controls stay on top, have room, and remain tappable.
+   Fixes iPhone 13 landscape where controls did not respond to taps. */
 @media (orientation: landscape) and (max-height: 500px) {
+    /* Override StPageFlip's inline min-height (300px) so the flipbook doesn't
+       force 300px and overlap the bottom controls. */
+    .flipbook-container,
+    .flipbook-container.stf__parent {
+        min-height: 0 !important;
+    }
+
     .flipbook-container {
-        height: 55vh;
+        height: 50vh;
     }
 
     .controls {
         padding: 10px 20px;
         padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        padding-left: max(10px, env(safe-area-inset-left, 0px));
+        padding-right: max(10px, env(safe-area-inset-right, 0px));
         pointer-events: auto !important;
         opacity: 1 !important;
-        /* Keep controls clearly above flipbook canvas */
-        z-index: 500;
+        /* Above flipbook; create own layer so iOS hit-testing works (stf__parent uses translateZ(0)) */
+        z-index: 999;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        /* Prevent accidental text selection on long-press */
+        -webkit-user-select: none;
+        user-select: none;
     }
 
     /* Larger tap targets in landscape (at least 44px for accessibility) */
@@ -497,6 +512,7 @@ html, body {
         width: 20px;
         height: 20px;
     }
+
 }
 
 /* ============================================

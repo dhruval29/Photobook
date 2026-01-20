@@ -121,14 +121,16 @@ function setupEventListeners() {
     elements.prevBtn.addEventListener('click', () => previousPage());
     elements.nextBtn.addEventListener('click', () => nextPage());
 
-    // Page slider
+    // Page slider (input = while dragging; change = on release, helps on iOS)
     if (elements.pageSlider) {
-        elements.pageSlider.addEventListener('input', (e) => {
+        const onSliderChange = (e) => {
             const pageIndex = parseInt(e.target.value, 10);
             if (pageFlip && pageIndex >= 0 && pageIndex < PAGE_COUNT && pageIndex !== currentPageNumber) {
                 pageFlip.turnToPage(pageIndex);
             }
-        });
+        };
+        elements.pageSlider.addEventListener('input', onSliderChange);
+        elements.pageSlider.addEventListener('change', onSliderChange);
     }
     
     // Instructions
