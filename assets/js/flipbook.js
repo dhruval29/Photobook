@@ -554,8 +554,8 @@ function handleResize() {
                 pageFlip.flip(currentPage);
             }
         });
-    } else if (pageFlip) {
-        // Just update dimensions
+    } else if (pageFlip && pageFlip.getPageCount && pageFlip.getPageCount() > 0) {
+        // Just update dimensions (only if flipbook is fully initialized with pages)
         pageFlip.updateFromHtml();
     }
 }
